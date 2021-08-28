@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net451</TargetFrameworks>
+    <Authors>David Palmer</Authors>
+    <PackageProjectUrl>https://github.com/davidrpalmer/WinHttpUrlAclDotNet</PackageProjectUrl>
+    <Description>A .NET wrapper for the Win32 HTTP Server URL ACL APIs.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/davidrpalmer/WinHttpServerApiDotNet</RepositoryUrl>
+    <Copyright>Copyright (c) 2021 David Palmer</Copyright>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageTags>pinvoke netsh urlacl</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
+</Project>
