@@ -1,7 +1,5 @@
 ﻿using System;
-#if NETFRAMEWORK //TODO If .NET CORE then use the NuGet package with these types in instead.
 using System.Security.Principal;
-#endif
 
 namespace WinHttpServerApi
 {
@@ -21,7 +19,6 @@ namespace WinHttpServerApi
 
         public bool Delegate { get; set; }
 
-#if NETFRAMEWORK
         public void SetSid(NTAccount account) => SetSid((SecurityIdentifier)account.Translate(typeof(SecurityIdentifier)));
 
         public void SetSid(WellKnownSidType sid) => SetSid(new SecurityIdentifier(sid, null));
@@ -48,6 +45,5 @@ namespace WinHttpServerApi
             }
             return GetSidObject().Translate(typeof(NTAccount)).Value;
         }
-#endif
     }
 }

@@ -20,6 +20,9 @@
     <PackageReference Include="Sddl.Parser">
       <Version>1.0.4-dev-00034</Version>
     </PackageReference>
+    <PackageReference Include="System.Security.Principal.Windows">
+      <Version>5.0.0</Version>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
