@@ -12,12 +12,31 @@ namespace Test
             {
                 /*
                  * The below should produce:
-                 *   Add new...
-                 *      URL: http://+:1234/
-                 *     SDDL: D:(A;;GX;;;AU)
-                 *   Overwrite...
-                 *      URL: http://+:1234/
-                 *     SDDL: D:(A;;GX;;;WD)
+                        Add new...
+                           URL: http://+:1234/
+                           SDDL: D:(A;;GX;;;AU)
+                            SID: AU
+                              Name: NT AUTHORITY\Authenticated Users
+                              Listen: True
+                              Delegate: False
+                        Overwrite...
+                           URL: http://+:1234/
+                           SDDL: D:(A;;GX;;;WD)
+                            SID: WD
+                              Name: Everyone
+                              Listen: True
+                              Delegate: False
+                        Overwrite (multiple accounts)...
+                           URL: http://+:1234/
+                           SDDL: D:(A;;GX;;;WD)(A;;GW;;;BU)
+                            SID: WD
+                              Name: Everyone
+                              Listen: True
+                              Delegate: False
+                            SID: BU
+                              Name: BUILTIN\Users
+                              Listen: False
+                              Delegate: True
                  */
 
                 const ushort port = 1234;
