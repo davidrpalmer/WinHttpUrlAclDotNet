@@ -15,11 +15,36 @@ namespace WinHttpServerApi
         /// </summary>
         public string Sid { get; set; }
 
+        /// <summary>
+        /// Allow the user to register URLs. Default: true
+        /// </summary>
         public bool Listen { get; set; } = true;
 
+        /// <summary>
+        /// Allow the user to delegate URLs. Default: false
+        /// </summary>
         public bool Delegate { get; set; }
 
-        public void SetSid(NTAccount account) => SetSid((SecurityIdentifier)account.Translate(typeof(SecurityIdentifier)));
+        public UrlPermissions()
+        {
+        }
+
+        public UrlPermissions(NTAccount account)
+        {
+            SetSid(account);
+        }
+
+        public UrlPermissions(WellKnownSidType sid)
+        {
+            SetSid(sid);
+        }
+
+        public UrlPermissions(SecurityIdentifier sid)
+        {
+            SetSid(sid);
+        }
+
+        public void SetSid(NTAccount account) => SetSid((SecurityIdentifier)account?.Translate(typeof(SecurityIdentifier)));
 
         public void SetSid(WellKnownSidType sid) => SetSid(new SecurityIdentifier(sid, null));
 
