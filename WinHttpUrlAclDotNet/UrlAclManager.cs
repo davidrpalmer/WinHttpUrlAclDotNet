@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.InteropServices;
-#if NET451
-using System.Security.Principal;
-#endif
+using System.Text;
 
 namespace WinHttpServerApi
 {
@@ -22,51 +21,44 @@ namespace WinHttpServerApi
             }
         }
 
-#if NET451
-        /// <param name="permissions">The permissions to grant the specified account. NULL for default.</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="Win32Exception"></exception>
-        public void AddUrl(string networkURL, NTAccount account, UrlPermissions permissions, bool overwrite) => AddUrl(networkURL, (SecurityIdentifier)account?.Translate(typeof(SecurityIdentifier)), permissions, overwrite);
+        public void AddUrl(string networkURL, UrlPermissions permissions, bool overwrite) => AddUrl(networkURL, new UrlPermissions[] { permissions }, overwrite);
 
-        /// <param name="permissions">The permissions to grant the specified SID. NULL for default.</param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="Win32Exception"></exception>
-        public void AddUrl(string networkURL, WellKnownSidType sid, UrlPermissions permissions, bool overwrite) => AddUrl(networkURL, new SecurityIdentifier(sid, null), permissions, overwrite);
-
-        /// <param name="permissions">The permissions to grant the specified SID. NULL for default.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="Win32Exception"></exception>
-        public void AddUrl(string networkURL, SecurityIdentifier sid, UrlPermissions permissions, bool overwrite) => AddUrlBySidString(networkURL, sid.ToString(), permissions, overwrite);
-#endif
-
-        /// <param name="sid">The account SID to grant access to. Example: S-1-1-0</param>
-        /// <param name="permissions">The permissions to grant the specified SID. NULL for default.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="Win32Exception"></exception>
-        public void AddUrlBySidString(string networkURL, string sid, UrlPermissions permissions, bool overwrite)
+        public void AddUrl(string networkURL, UrlPermissions[] permissionsArray, bool overwrite)
         {
-            if (string.IsNullOrWhiteSpace(sid))
-            {
-                throw new ArgumentNullException(nameof(sid));
-            }
-            permissions = permissions ?? new UrlPermissions();
+            if (permissionsArray == null)
+                throw new ArgumentNullException(nameof(permissionsArray));
+            if (permissionsArray.Length <= 0)
+                throw new ArgumentException("Permissions array cannot be empty.");
+            if (permissionsArray.Any(x => x == null))
+                throw new ArgumentException("Permissions array cannot have any null items.");
+            if (permissionsArray.Any(x => string.IsNullOrWhiteSpace(x.Sid)))
+                throw new ArgumentException("SID cannot be null/empty.");
 
-            char allowDeny;
-            char permission;
-            if (permissions.Delegate == permissions.Listen)
+            var sddl = new StringBuilder("D:");
+
+            foreach (var permissions in permissionsArray)
             {
-                allowDeny = permissions.Delegate ? 'A' : 'D';
-                permission = 'A';
-            }
-            else
-            {
-                allowDeny = 'A';
-                permission = permissions.Listen ? 'X' : 'W';
+                char allowDeny;
+                char right;
+                if (permissions.Delegate == permissions.Listen)
+                {
+                    allowDeny = permissions.Delegate ? 'A' : 'D';
+                    right = 'A';
+                }
+                else
+                {
+                    allowDeny = 'A';
+                    right = permissions.Listen ? 'X' : 'W';
+                }
+
+                sddl.Append($"({allowDeny};;G{right};;;{permissions.Sid})");
             }
 
-            string sddl = $"D:({allowDeny};;G{permission};;;{sid})";
-
-            AddUrl(networkURL, sddl, overwrite);
+            AddUrl(networkURL, sddl.ToString(), overwrite);
         }
 
         /// <param name="securityDescriptor">An SDDL string. Example: D:(A;;GX;;;S-1-1-0)</param>

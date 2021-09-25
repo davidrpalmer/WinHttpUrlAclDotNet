@@ -22,6 +22,7 @@ namespace Test
 
                 const ushort port = 1234;
                 string url = $"http://+:{port}/";
+                var permissions = new WinHttpServerApi.UrlPermissions();
 
                 var checkBefore = api.QueryUrls();
                 if (checkBefore.Any(x => x.Url.Contains($":{port}/")))
@@ -30,10 +31,12 @@ namespace Test
                 }
 
                 Console.WriteLine("Add new...");
-                api.AddUrl(url, System.Security.Principal.WellKnownSidType.AuthenticatedUserSid, null, false);
+                permissions.SetSid(System.Security.Principal.WellKnownSidType.AuthenticatedUserSid);
+                api.AddUrl(url, permissions, false);
+                permissions.SetSid(System.Security.Principal.WellKnownSidType.BuiltinAdministratorsSid);
                 try
                 {
-                    api.AddUrl(url, System.Security.Principal.WellKnownSidType.BuiltinAdministratorsSid, null, false);
+                    api.AddUrl(url, permissions, false);
                     throw new Exception("SHOULD NOT GET HERE! The above should have failed because it's a duplicate.");
                 }
                 catch (System.ComponentModel.Win32Exception ex) when (ex.NativeErrorCode == (int)WinHttpServerApi.Win32ErrorCode.ERROR_ALREADY_EXISTS)
@@ -44,18 +47,75 @@ namespace Test
                     if (entry.Url.Contains($":{port}/"))
                     {
                         Console.WriteLine("   URL: " + entry.Url);
-                        Console.WriteLine("  SDDL: " + entry.Sddl);
+                        Console.WriteLine("   SDDL: " + entry.Sddl);
+
+                        var decodedPermissions = entry.GetPermissions();
+                        foreach (var decodedPermission in decodedPermissions)
+                        {
+                            Console.WriteLine("    SID: " + decodedPermission.Sid);
+                            if (!decodedPermission.GetSidObject().IsWellKnown(System.Security.Principal.WellKnownSidType.AuthenticatedUserSid))
+                            {
+                                Console.WriteLine("      Error, SID is not the expected SID!");
+                            }
+                            Console.WriteLine("      Name: " + decodedPermission.GetSidName());
+                            Console.WriteLine("      Listen: " + decodedPermission.Listen);
+                            Console.WriteLine("      Delegate: " + decodedPermission.Delegate);
+                        }
                     }
                 }
 
                 Console.WriteLine("Overwrite...");
-                api.AddUrl(url, System.Security.Principal.WellKnownSidType.WorldSid, null, true);
+                permissions.SetSid(System.Security.Principal.WellKnownSidType.WorldSid);
+                api.AddUrl(url, permissions, true);
                 foreach (var entry in api.QueryUrls())
                 {
                     if (entry.Url.Contains($":{port}/"))
                     {
                         Console.WriteLine("   URL: " + entry.Url);
-                        Console.WriteLine("  SDDL: " + entry.Sddl);
+                        Console.WriteLine("   SDDL: " + entry.Sddl);
+
+                        var decodedPermissions = entry.GetPermissions();
+                        foreach (var decodedPermission in decodedPermissions)
+                        {
+                            Console.WriteLine("    SID: " + decodedPermission.Sid);
+                            if (!decodedPermission.GetSidObject().IsWellKnown(System.Security.Principal.WellKnownSidType.WorldSid))
+                            {
+                                Console.WriteLine("      Error, SID is not the expected SID!");
+                            }
+                            Console.WriteLine("      Name: " + decodedPermission.GetSidName());
+                            Console.WriteLine("      Listen: " + decodedPermission.Listen);
+                            Console.WriteLine("      Delegate: " + decodedPermission.Delegate);
+                        }
+                    }
+                }
+
+                Console.WriteLine("Overwrite (multiple accounts)...");
+                var permissionsList = new WinHttpServerApi.UrlPermissions[]
+                {
+                    permissions,
+                    new WinHttpServerApi.UrlPermissions()
+                    {
+                         Delegate = true,
+                         Listen = false
+                    }
+                };
+                permissionsList[1].SetSid(System.Security.Principal.WellKnownSidType.BuiltinUsersSid);
+                api.AddUrl(url, permissionsList, true);
+                foreach (var entry in api.QueryUrls())
+                {
+                    if (entry.Url.Contains($":{port}/"))
+                    {
+                        Console.WriteLine("   URL: " + entry.Url);
+                        Console.WriteLine("   SDDL: " + entry.Sddl);
+
+                        var decodedPermissions = entry.GetPermissions();
+                        foreach (var decodedPermission in decodedPermissions)
+                        {
+                            Console.WriteLine("    SID: " + decodedPermission.Sid);
+                            Console.WriteLine("      Name: " + decodedPermission.GetSidName());
+                            Console.WriteLine("      Listen: " + decodedPermission.Listen);
+                            Console.WriteLine("      Delegate: " + decodedPermission.Delegate);
+                        }
                     }
                 }
 
