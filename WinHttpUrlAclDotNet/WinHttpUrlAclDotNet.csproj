@@ -4,12 +4,15 @@
     <TargetFrameworks>netstandard2.0;net451;net472</TargetFrameworks>
     <Authors>David Palmer</Authors>
     <PackageProjectUrl>https://github.com/davidrpalmer/WinHttpUrlAclDotNet</PackageProjectUrl>
-    <Description>A .NET wrapper for the Win32 HTTP Server URL ACL APIs.</Description>
+    <Description>A .NET wrapper for the Win32 HTTP Server URL ACL APIs. This library can be considered as a programmatic alternative to Windows command line tools netsh http show|add|delete urlacl.
+
+This library wraps around native methods HttpSetServiceConfiguration, HttpDeleteServiceConfiguration and HttpQueryServiceConfiguration.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/davidrpalmer/WinHttpServerApiDotNet</RepositoryUrl>
+    <RepositoryUrl>https://github.com/davidrpalmer/WinHttpUrlAclDotNet</RepositoryUrl>
     <Copyright>Copyright (c) 2021 David Palmer</Copyright>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageTags>pinvoke netsh urlacl</PackageTags>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
