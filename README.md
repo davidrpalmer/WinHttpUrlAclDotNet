@@ -3,6 +3,8 @@ A .NET wrapper for the Win32 HTTP Server URL ACL APIs found in `Http.h`. This li
 
 This library wraps around native methods `HttpSetServiceConfiguration`, `HttpDeleteServiceConfiguration` and `HttpQueryServiceConfiguration`.
 
+Get from [NuGet.org](https://www.nuget.org/packages/WinHttpUrlAclDotNet/1.0.0)
+
 ## Usage
 ```c#
 try
