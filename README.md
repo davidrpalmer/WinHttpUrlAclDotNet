@@ -7,11 +7,12 @@ Get from [NuGet.org](https://www.nuget.org/packages/WinHttpUrlAclDotNet/1.0.0)
 
 ## Usage
 ```c#
+var permissions = new WinHttpServerApi.UrlPermissions(WellKnownSidType.AuthenticatedUserSid);
 try
 {
     using (var api = new WinHttpServerApi.UrlAclManager())
     {
-        api.AddUrl("http://+:1234/", WellKnownSidType.AuthenticatedUserSid, null, false);
+        api.AddUrl("http://+:1234/", permissions, false);
     }
 }
 catch (Win32Exception ex) when (ex.NativeErrorCode == (int)WinHttpServerApi.Win32ErrorCode.ERROR_ACCESS_DENIED)
